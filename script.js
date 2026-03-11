@@ -8,6 +8,7 @@ const counter = document.getElementById("counter");
 const progress = document.getElementById("progress");
 const exportBtn = document.getElementById("exportBtn");
 const startCameraBtn = document.getElementById("startCameraBtn");
+const videoPreview = document.getElementById("videoPreview");
 
 let codeReader = new ZXing.BrowserBarcodeReader();
 
@@ -71,18 +72,24 @@ startCameraBtn.addEventListener("click", () => {
 function startCameraScanner() {
     codeReader.reset();
 
-    // Eerst proberen met exact achtercamera
-    const videoConstraints = { video: { facingMode: { exact: "environment" } } };
+    // Zoek beschikbare camera's
+    ZXing.BrowserBarcodeReader.listVideoInputDevices()
+        .then(videoInputDevices => {
+            if(videoInputDevices.length === 0){
+                alert("Geen camera gevonden!");
+                return;
+            }
+            const firstDeviceId = videoInputDevices[0].deviceId;
 
-    codeReader.decodeFromConstraints(videoConstraints, "reader", (result, err)=>{
-        if(result) handleScan(result.text);
-    }).catch(err=>{
-        // fallback: zonder exact
-        const fallbackConstraints = { video: { facingMode: "environment" } };
-        codeReader.decodeFromConstraints(fallbackConstraints, "reader", (result, err)=>{
-            if(result) handleScan(result.text);
-        }).catch(err2=>console.error("Camera fout:", err2));
-    });
+            // Live preview in video element
+            codeReader.decodeFromVideoDevice(firstDeviceId, "videoPreview", (result, err) => {
+                if(result){
+                    handleScan(result.text);
+                }
+                // errors negeren zodat scanner actief blijft
+            });
+        })
+        .catch(err => console.error("Camera fout:", err));
 }
 
 // =====================
