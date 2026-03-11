@@ -2,26 +2,33 @@
 <html>
 <head>
 <meta charset="UTF-8">
-<title>Terminal Scanner</title>
+<title>Terminal Scanner Mobiel</title>
 <link rel="stylesheet" href="style.css">
+<script src="https://unpkg.com/html5-qrcode"></script> <!-- Camera scanner -->
+<script src="https://cdn.sheetjs.com/xlsx-latest/package/dist/xlsx.full.min.js"></script> <!-- Excel -->
 </head>
 <body>
 
-<h1>Terminal Scanner</h1>
+<h1>Terminal Scanner Mobiel</h1>
 
+<!-- Excel upload -->
 <input type="file" id="fileInput" accept=".xlsx,.xls">
 <br><br>
-<input id="input" placeholder="Scan hier barcode" disabled>
+
+<!-- Barcode input voor fallback (optioneel) -->
+<input id="input" placeholder="Scan barcode (handmatig)" disabled>
+
+<!-- Camera scanner -->
+<div id="reader" style="width:300px;margin:auto;"></div>
 
 <div class="box">
     <h2 id="status">Upload Excel bestand</h2>
     <h3 id="counter">0 / 0</h3>
     <progress id="progress" value="0" max="100" style="width:80%"></progress>
     <br><br>
-<button id="exportBtn" disabled>Export lijst</button>
+    <button id="exportBtn" disabled>Export lijst</button>
 </div>
 
-<script src="https://cdn.sheetjs.com/xlsx-latest/package/dist/xlsx.full.min.js"></script>
 <script src="script.js"></script>
 </body>
 </html>
