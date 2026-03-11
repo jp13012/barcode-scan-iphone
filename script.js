@@ -7,8 +7,9 @@ const status = document.getElementById("status");
 const counter = document.getElementById("counter");
 const progress = document.getElementById("progress");
 const exportBtn = document.getElementById("exportBtn");
+const startCameraBtn = document.getElementById("startCameraBtn");
 
-let codeReader = new ZXing.BrowserBarcodeReader(); // ZXing scanner
+let codeReader = new ZXing.BrowserBarcodeReader();
 
 // =====================
 // Excel / CSV upload
@@ -57,33 +58,31 @@ function startAfterFileLoad() {
     input.disabled = false;
     exportBtn.disabled = false;
     input.focus();
-    startCameraScanner();
 }
 
 // =====================
-// Camera scanner starten
+// Start camera na user gesture (iOS friendly)
 // =====================
+startCameraBtn.addEventListener("click", () => {
+    startCameraScanner();
+    startCameraBtn.disabled = true;
+});
+
 function startCameraScanner() {
-    codeReader.reset(); // stop vorige scanner
+    codeReader.reset();
 
-    // Zoek eerste beschikbare camera
-    ZXing.BrowserBarcodeReader.listVideoInputDevices()
-        .then(videoInputDevices => {
-            if(videoInputDevices.length === 0){
-                alert("Geen camera gevonden!");
-                return;
-            }
-            const firstDeviceId = videoInputDevices[0].deviceId;
+    // Eerst proberen met exact achtercamera
+    const videoConstraints = { video: { facingMode: { exact: "environment" } } };
 
-            // Start continue scanning
-            codeReader.decodeFromVideoDevice(firstDeviceId, "reader", (result, err) => {
-                if(result){
-                    handleScan(result.text);
-                }
-                // errors negeren, scanner blijft actief
-            });
-        })
-        .catch(err => console.error("Camera fout:", err));
+    codeReader.decodeFromConstraints(videoConstraints, "reader", (result, err)=>{
+        if(result) handleScan(result.text);
+    }).catch(err=>{
+        // fallback: zonder exact
+        const fallbackConstraints = { video: { facingMode: "environment" } };
+        codeReader.decodeFromConstraints(fallbackConstraints, "reader", (result, err)=>{
+            if(result) handleScan(result.text);
+        }).catch(err2=>console.error("Camera fout:", err2));
+    });
 }
 
 // =====================
@@ -95,7 +94,7 @@ input.addEventListener("change", () => {
 });
 
 // =====================
-// Scan handler (gedeeld)
+// Scan handler
 // =====================
 function handleScan(code) {
     if(needed.includes(code)){
@@ -157,5 +156,5 @@ function beep(freq){
     osc.frequency.value = freq;
     osc.connect(ctx.destination);
     osc.start();
-    setTimeout(()=>osc.stop(),150); // stopt oscillator na 150ms
+    setTimeout(()=>osc.stop(),150);
 }
