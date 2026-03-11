@@ -8,7 +8,7 @@ const counter = document.getElementById("counter");
 const progress = document.getElementById("progress");
 const exportBtn = document.getElementById("exportBtn");
 
-let html5QrScanner;
+let codeReader = new ZXing.BrowserBarcodeReader(); // ZXing scanner
 
 // =====================
 // Excel / CSV upload
@@ -64,31 +64,18 @@ function startAfterFileLoad() {
 // Camera scanner starten
 // =====================
 function startCameraScanner() {
-    if(html5QrScanner) {
-        html5QrScanner.stop().catch(()=>{});
-    }
+    codeReader.reset(); // stop eventuele eerdere scanner
 
-    html5QrScanner = new Html5Qrcode("reader");
-
-    html5QrScanner.start(
-        { facingMode: "environment" },
-        { 
-            fps: 10,
-            qrbox: 250,
-            formatsToSupport: [
-                Html5QrcodeSupportedFormats.CODE_128,
-                Html5QrcodeSupportedFormats.CODE_39,
-                Html5QrcodeSupportedFormats.EAN_13
-            ]
-        },
-        (decodedText, decodedResult) => {
-            handleScan(decodedText);
-        },
-        (errorMessage) => {
-            // optioneel loggen
-            // console.log(errorMessage);
-        }
-    ).catch(err => console.error("Camera start fout:", err));
+    codeReader.decodeFromConstraints(
+        { video: { facingMode: "environment" } },
+        "reader"
+    ).then(result => {
+        handleScan(result.text);
+        startCameraScanner(); // opnieuw starten voor volgende scan
+    }).catch(err => {
+        // optioneel loggen
+        // console.log(err);
+    });
 }
 
 // =====================
