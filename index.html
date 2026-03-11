@@ -4,20 +4,22 @@
 <meta charset="UTF-8">
 <title>Terminal Scanner Mobiel</title>
 <link rel="stylesheet" href="style.css">
-<!-- html5-qrcode voor camera barcode scanning -->
-<script src="https://unpkg.com/html5-qrcode"></script>
+
+<!-- ZXing barcode scanner -->
+<script src="https://unpkg.com/@zxing/library@latest"></script>
 <!-- SheetJS voor Excel/CSV import/export -->
 <script src="https://cdn.sheetjs.com/xlsx-latest/package/dist/xlsx.full.min.js"></script>
+
 </head>
 <body>
 
 <h1>Terminal Scanner</h1>
 
-<!-- Excel / CSV upload -->
+<!-- Excel / CSV / ODS upload -->
 <input type="file" id="fileInput" accept=".xlsx,.xls,.ods,.csv">
 <br><br>
 
-<!-- Handmatige barcode input fallback -->
+<!-- Handmatige input fallback -->
 <input id="input" placeholder="Scan barcode (handmatig)" disabled>
 
 <!-- Camera scanner -->
@@ -32,7 +34,7 @@
     <button id="exportBtn" disabled>Export lijst</button>
 </div>
 
-<!-- Script met volledige functionaliteit -->
+<!-- Script -->
 <script src="script.js"></script>
 </body>
 </html>
