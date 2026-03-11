@@ -4,31 +4,35 @@
 <meta charset="UTF-8">
 <title>Terminal Scanner Mobiel</title>
 <link rel="stylesheet" href="style.css">
-<script src="https://unpkg.com/html5-qrcode"></script> <!-- Camera scanner -->
-<script src="https://cdn.sheetjs.com/xlsx-latest/package/dist/xlsx.full.min.js"></script> <!-- Excel -->
+<!-- html5-qrcode voor camera barcode scanning -->
+<script src="https://unpkg.com/html5-qrcode"></script>
+<!-- SheetJS voor Excel/CSV import/export -->
+<script src="https://cdn.sheetjs.com/xlsx-latest/package/dist/xlsx.full.min.js"></script>
 </head>
 <body>
 
-<h1>Terminal Scanner Mobiel</h1>
+<h1>Terminal Scanner</h1>
 
-<!-- Excel upload -->
-<input type="file" id="fileInput" accept=".xlsx,.xls">
+<!-- Excel / CSV upload -->
+<input type="file" id="fileInput" accept=".xlsx,.xls,.ods,.csv">
 <br><br>
 
-<!-- Barcode input voor fallback (optioneel) -->
+<!-- Handmatige barcode input fallback -->
 <input id="input" placeholder="Scan barcode (handmatig)" disabled>
 
 <!-- Camera scanner -->
-<div id="reader" style="width:300px;margin:auto;"></div>
+<div id="reader" style="width:300px; margin:auto; padding-top:20px;"></div>
 
+<!-- Voortgang en export -->
 <div class="box">
-    <h2 id="status">Upload Excel bestand</h2>
+    <h2 id="status">Upload Excel / CSV bestand</h2>
     <h3 id="counter">0 / 0</h3>
     <progress id="progress" value="0" max="100" style="width:80%"></progress>
     <br><br>
     <button id="exportBtn" disabled>Export lijst</button>
 </div>
 
+<!-- Script met volledige functionaliteit -->
 <script src="script.js"></script>
 </body>
 </html>
