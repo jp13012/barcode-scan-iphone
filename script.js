@@ -6,6 +6,9 @@ const input = document.getElementById("input");
 const status = document.getElementById("status");
 const counter = document.getElementById("counter");
 const progress = document.getElementById("progress");
+const exportBtn = document.getElementById("exportBtn");
+
+let html5QrScanner;
 
 // Excel upload
 fileInput.addEventListener("change", (e) => {
@@ -19,10 +22,8 @@ fileInput.addEventListener("change", (e) => {
         const firstSheet = workbook.Sheets[workbook.SheetNames[0]];
         const json = XLSX.utils.sheet_to_json(firstSheet, { header: 1 });
 
-        // Alles omzetten naar string + trim
-        needed = json.flat()
-                     .filter(v => v != null)
-                     .map(v => v.toString().trim());
+        // Alles naar string + trim
+        needed = json.flat().filter(v => v != null).map(v => v.toString().trim());
         found = [];
 
         counter.innerText = `0 / ${needed.length}`;
@@ -31,16 +32,39 @@ fileInput.addEventListener("change", (e) => {
 
         status.innerText = "Scan barcode...";
         input.disabled = false;
-        input.focus();
+        exportBtn.disabled = false;
 
-        console.log("Barcodes geladen:", needed);
+        startCameraScanner();
     }
     reader.readAsArrayBuffer(file);
 });
 
-// Barcode scan
+// Camera scanner starten
+function startCameraScanner() {
+    if (html5QrScanner) html5QrScanner.stop();
+
+    html5QrScanner = new Html5Qrcode("reader");
+
+    html5QrScanner.start(
+        { facingMode: "environment" },
+        { fps: 10, qrbox: 250 },
+        (decodedText, decodedResult) => {
+            handleScan(decodedText);
+        },
+        (errorMessage) => {
+            // console.log(errorMessage);
+        }
+    ).catch(err => console.error(err));
+}
+
+// Barcode scan via input veld (fallback)
 input.addEventListener("change", () => {
-    const code = input.value.trim();
+    handleScan(input.value.trim());
+    input.value = "";
+});
+
+// Scan handler (gedeeld voor camera en input)
+function handleScan(code) {
     if (needed.includes(code)) {
         if (!found.includes(code)) {
             found.push(code);
@@ -60,7 +84,6 @@ input.addEventListener("change", () => {
     counter.innerText = `${found.length} / ${needed.length}`;
     progress.value = found.length;
 
-    input.value = "";
     setTimeout(() => {
         document.body.className = "";
         if(found.length < needed.length) status.innerText = "Scan barcode...";
@@ -70,27 +93,16 @@ input.addEventListener("change", () => {
         status.innerText = "ALLE TERMINALS GEVONDEN!";
         beep(1500);
     }
-});
-// Export functie
-const exportBtn = document.getElementById("exportBtn");
+}
 
+// Export knop
 exportBtn.addEventListener("click", () => {
-    if (needed.length === 0) return;
-
     const notFound = needed.filter(code => !found.includes(code));
-
-    const data = [
-        ["Gevonden", "Nog niet gevonden"]
-    ];
-
-    // Bepaal maximale lengte van beide kolommen
+    const data = [["Gevonden", "Nog niet gevonden"]];
     const maxLen = Math.max(found.length, notFound.length);
 
     for (let i = 0; i < maxLen; i++) {
-        data.push([
-            found[i] || "",       // lege cel als geen waarde
-            notFound[i] || ""
-        ]);
+        data.push([found[i] || "", notFound[i] || ""]);
     }
 
     const ws = XLSX.utils.aoa_to_sheet(data);
@@ -98,11 +110,6 @@ exportBtn.addEventListener("click", () => {
     XLSX.utils.book_append_sheet(wb, ws, "Terminals");
 
     XLSX.writeFile(wb, "terminals_export.xlsx");
-});
-
-// Activeer knop zodra je Excel geladen hebt
-fileInput.addEventListener("change", () => {
-    exportBtn.disabled = false;
 });
 
 // Geluid functie
