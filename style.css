@@ -1,0 +1,20 @@
+body {
+    font-family: Arial;
+    text-align: center;
+    background: #f4f6f8;
+    transition: background 0.3s;
+}
+
+#input {
+    font-size: 30px;
+    padding: 10px;
+    width: 400px;
+    text-align: center;
+}
+
+.good { background: #7CFC00; }
+.bad { background: #ff4d4d; }
+
+.box {
+    margin-top: 40px;
+}
