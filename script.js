@@ -64,18 +64,26 @@ function startAfterFileLoad() {
 // Camera scanner starten
 // =====================
 function startCameraScanner() {
-    codeReader.reset(); // stop eventuele eerdere scanner
+    codeReader.reset(); // stop vorige scanner
 
-    codeReader.decodeFromConstraints(
-        { video: { facingMode: "environment" } },
-        "reader"
-    ).then(result => {
-        handleScan(result.text);
-        startCameraScanner(); // opnieuw starten voor volgende scan
-    }).catch(err => {
-        // optioneel loggen
-        // console.log(err);
-    });
+    // Zoek eerste beschikbare camera
+    ZXing.BrowserBarcodeReader.listVideoInputDevices()
+        .then(videoInputDevices => {
+            if(videoInputDevices.length === 0){
+                alert("Geen camera gevonden!");
+                return;
+            }
+            const firstDeviceId = videoInputDevices[0].deviceId;
+
+            // Start continue scanning
+            codeReader.decodeFromVideoDevice(firstDeviceId, "reader", (result, err) => {
+                if(result){
+                    handleScan(result.text);
+                }
+                // errors negeren, scanner blijft actief
+            });
+        })
+        .catch(err => console.error("Camera fout:", err));
 }
 
 // =====================
@@ -149,5 +157,5 @@ function beep(freq){
     osc.frequency.value = freq;
     osc.connect(ctx.destination);
     osc.start();
-    setTimeout(()=>osc.stop(),150);
+    setTimeout(()=>osc.stop(),150); // stopt oscillator na 150ms
 }
