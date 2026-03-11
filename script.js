@@ -71,6 +71,39 @@ input.addEventListener("change", () => {
         beep(1500);
     }
 });
+// Export functie
+const exportBtn = document.getElementById("exportBtn");
+
+exportBtn.addEventListener("click", () => {
+    if (needed.length === 0) return;
+
+    const notFound = needed.filter(code => !found.includes(code));
+
+    const data = [
+        ["Gevonden", "Nog niet gevonden"]
+    ];
+
+    // Bepaal maximale lengte van beide kolommen
+    const maxLen = Math.max(found.length, notFound.length);
+
+    for (let i = 0; i < maxLen; i++) {
+        data.push([
+            found[i] || "",       // lege cel als geen waarde
+            notFound[i] || ""
+        ]);
+    }
+
+    const ws = XLSX.utils.aoa_to_sheet(data);
+    const wb = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(wb, ws, "Terminals");
+
+    XLSX.writeFile(wb, "terminals_export.xlsx");
+});
+
+// Activeer knop zodra je Excel geladen hebt
+fileInput.addEventListener("change", () => {
+    exportBtn.disabled = false;
+});
 
 // Geluid functie
 function beep(freq) {
