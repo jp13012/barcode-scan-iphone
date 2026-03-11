@@ -15,21 +15,21 @@
 
 <h1>Terminal Scanner</h1>
 
-<!-- Excel / CSV / ODS upload -->
+<!-- Bestand upload -->
 <input type="file" id="fileInput" accept=".xlsx,.xls,.ods,.csv">
 <br><br>
 
-<!-- Handmatige input fallback -->
+<!-- Handmatige input -->
 <input id="input" placeholder="Scan barcode (handmatig)" disabled>
 <br><br>
 
-<!-- Start camera knop voor iOS / mobiele compatibiliteit -->
+<!-- Start camera knop -->
 <button id="startCameraBtn">Start Camera</button>
 
 <!-- Camera preview -->
-<video id="videoPreview" style="width:100%; max-width:400px; height:300px; margin:auto; padding-top:20px;" autoplay></video>
+<video id="videoPreview" style="width:100%; max-width:400px; height:300px; margin:auto; padding-top:20px;" autoplay playsinline muted></video>
 
-<!-- Voortgang en export -->
+<!-- Voortgang -->
 <div class="box">
     <h2 id="status">Upload Excel / CSV bestand</h2>
     <h3 id="counter">0 / 0</h3>
