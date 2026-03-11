@@ -1,27 +1,13 @@
 <!DOCTYPE html>
 <html>
 <head>
-<title>Terminal Scanner Excel</title>
-<style>
-body{
-    font-family: Arial;
-    text-align:center;
-    background:#f4f6f8;
-}
-#input{
-    font-size:30px;
-    padding:10px;
-    width:400px;
-    text-align:center;
-}
-.good{background:#7CFC00;}
-.bad{background:#ff4d4d;}
-.box{margin-top:40px;}
-</style>
+<meta charset="UTF-8">
+<title>Terminal Scanner</title>
+<link rel="stylesheet" href="style.css">
 </head>
 <body>
 
-<h1>Terminal Scanner Excel</h1>
+<h1>Terminal Scanner</h1>
 
 <input type="file" id="fileInput" accept=".xlsx,.xls">
 <br><br>
@@ -30,81 +16,10 @@ body{
 <div class="box">
     <h2 id="status">Upload Excel bestand</h2>
     <h3 id="counter">0 / 0</h3>
+    <progress id="progress" value="0" max="100" style="width:80%"></progress>
 </div>
 
 <script src="https://cdn.sheetjs.com/xlsx-latest/package/dist/xlsx.full.min.js"></script>
-<script>
-
-let needed = [];
-let found = [];
-
-const fileInput = document.getElementById("fileInput");
-const input = document.getElementById("input");
-const status = document.getElementById("status");
-const counter = document.getElementById("counter");
-
-// Excel upload
-fileInput.addEventListener("change", (e)=>{
-    const file = e.target.files[0];
-    if(!file) return;
-
-    const reader = new FileReader();
-    reader.onload = (evt)=>{
-        const data = new Uint8Array(evt.target.result);
-        const workbook = XLSX.read(data,{type:'array'});
-        const firstSheet = workbook.Sheets[workbook.SheetNames[0]];
-        const json = XLSX.utils.sheet_to_json(firstSheet,{header:1});
-        needed = json.flat().filter(v=>v); // alle waarden in 1D array
-        found = [];
-        counter.innerText = `0 / ${needed.length}`;
-        status.innerText = "Scan barcode...";
-        input.disabled = false;
-        input.focus();
-        console.log("Barcodes geladen:", needed);
-    }
-    reader.readAsArrayBuffer(file);
-});
-
-// Barcode scan
-input.addEventListener("change", ()=>{
-    const code = input.value.trim();
-    if(needed.includes(code)){
-        if(!found.includes(code)){
-            found.push(code);
-            document.body.className="good";
-            beep(800);
-            status.innerText="GEVONDEN!";
-        } else {
-            beep(400);
-            status.innerText="Al gevonden";
-        }
-    } else {
-        document.body.className="bad";
-        beep(200);
-        status.innerText="Niet nodig";
-    }
-
-    counter.innerText = `${found.length} / ${needed.length}`;
-    input.value="";
-    setTimeout(()=>{ document.body.className=""; status.innerText="Scan barcode..."; }, 300);
-
-    if(found.length===needed.length){
-        status.innerText="ALLE TERMINALS GEVONDEN!";
-        beep(1500);
-    }
-});
-
-// geluid functie
-function beep(freq){
-    let ctx = new AudioContext();
-    let osc = ctx.createOscillator();
-    osc.type = "sine";
-    osc.frequency.value = freq;
-    osc.connect(ctx.destination);
-    osc.start();
-    setTimeout(()=>osc.stop(),150);
-}
-
-</script>
+<script src="script.js"></script>
 </body>
 </html>
