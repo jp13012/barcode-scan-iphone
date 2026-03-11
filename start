@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Terminal Scanner</title>
+
+<style>
+
+body{
+font-family:Arial;
+text-align:center;
+background:#f4f6f8;
+}
+
+#input{
+font-size:30px;
+padding:10px;
+width:400px;
+text-align:center;
+}
+
+.good{
+background:#7CFC00;
+}
+
+.bad{
+background:#ff4d4d;
+}
+
+.box{
+
+margin-top:40px;
+
+}
+
+</style>
+
+</head>
+
+<body>
+
+<h1>Terminal Scanner</h1>
+
+<input id="input" autofocus>
+
+<div class="box">
+
+<h2 id="status">Scan barcode</h2>
+
+<h3 id="counter">0 / 15</h3>
+
+</div>
+
+<script>
+
+let needed = [
+"123456",
+"654321",
+"111222"
+]
+
+let found = []
+
+let input = document.getElementById("input")
+
+input.addEventListener("change", function(){
+
+let code = input.value.trim()
+
+if(needed.includes(code)){
+
+if(!found.includes(code)){
+
+found.push(code)
+
+document.body.className="good"
+
+beep(800)
+
+}else{
+
+beep(400)
+
+}
+
+}else{
+
+document.body.className="bad"
+
+beep(200)
+
+}
+
+document.getElementById("counter").innerText =
+found.length+" / "+needed.length
+
+input.value=""
+
+setTimeout(()=>{
+
+document.body.className=""
+
+},300)
+
+})
+
+function beep(freq){
+
+let ctx = new AudioContext()
+
+let osc = ctx.createOscillator()
+
+osc.type="sine"
+
+osc.frequency.value=freq
+
+osc.connect(ctx.destination)
+
+osc.start()
+
+setTimeout(()=>{
+osc.stop()
+},150)
+
+}
+
+</script>
+
+</body>
+
+</html>
